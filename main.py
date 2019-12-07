@@ -31,19 +31,22 @@ def handle_input(scene):
 
     turn += pg.key.get_pressed()[pg.K_RIGHT]
     turn -= pg.key.get_pressed()[pg.K_LEFT]
-    scene.camera.rotate(turn * 5 * math.pi / 180)
+    scene.camera.rotate(turn * 2 * math.pi / 180)
 
     if pg.key.get_pressed()[pg.K_UP]:
+        speed = 0.1
         dx, dy = scene.camera.dir
         px, py = scene.camera.pos
+        buffer = 0.2
+        dx_b = buffer if dx > 0 else -buffer
+        dy_b = buffer if dy > 0 else -buffer
 
-        scene.camera.pos = (px + dx * 0.2, py + dy * 0.2)
-        # if not scene.world.has_tile_at(int(px + dx * 0.2), int(py)):
-        #     scene.camera.pos[0] += dx * 0.2
-        #     px += dx * 0.2
-        # if not scene.world.has_tile_at(int(px), int(py + dy * 0.2)):
-        #     scene.camera.pos[1] += dy * 0.2
-        #     py += dy * 0.2
+        if not scene.world.has_tile_at(int(px + dx * speed + dx_b), int(py)):
+            px += dx * speed
+        if not scene.world.has_tile_at(int(px), int(py + dy * speed + dy_b)):
+            py += dy * speed
+
+        scene.camera.pos = (px, py)
 
 
 def main():
