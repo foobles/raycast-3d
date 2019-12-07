@@ -19,8 +19,10 @@ WORLD_MAP = World([
 ])
 
 
-def load_textures(*textures):
-    return list(map(lambda x: pg.image.load(x).convert(), textures))
+class Texture:
+    def __init__(self, path, transparent=False):
+        self.surface = pg.image.load(path).convert()
+        self.transparent = transparent
 
 
 def handle_input(scene):
@@ -54,9 +56,10 @@ def main():
     size = 600, 600
     screen = pg.display.set_mode(size)
 
-    textures = load_textures(
-        "assets/wood.bmp",
-        "assets/brick.bmp")
+    textures = [
+        Texture("assets/wood.bmp"),
+        Texture("assets/brick.bmp")
+    ]
 
     scene = Scene(WORLD_MAP, Camera((4, 4), (0, -1), 60 * math.pi / 180))
 

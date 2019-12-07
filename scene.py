@@ -81,7 +81,7 @@ class Scene:
             ray_info = _get_ray_hit_info(self.camera.pos, ray, self.world)
             height = int(surface_height / ray_info.distance)
             column = _get_column(
-                textures[ray_info.hit - 1],
+                textures[ray_info.hit - 1].surface,
                 ray_info.wall_x_rat,
                 height)
 
