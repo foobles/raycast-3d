@@ -73,7 +73,7 @@ class Scene:
     def render(self, surface, textures):
         dark = pg.Surface((1, surface.get_height()))
         dark.fill((0, 0, 0))
-        dark.set_alpha(128)
+        dark.set_alpha(0.3 * 256)
 
         for x, ray in self.camera.rays(surface.get_width()):
             ray_info = _get_ray_hit_info(self.camera.pos, ray, self.world)
