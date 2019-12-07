@@ -21,7 +21,7 @@ def _get_ray_hit_info(pos, ray, world):
     y_tile_dist = math.sqrt(1 + (ray_x * ray_x) / (
         (ray_y * ray_y)
         if ray_y != 0
-        else float('nan')))
+        else 1))
 
     x_step = 1 if ray_x > 0 else -1
     x_dist_moved = x_tile_dist * (
