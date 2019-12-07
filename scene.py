@@ -71,10 +71,18 @@ class Scene:
         self.camera = camera
 
     def render(self, surface, textures):
+        dark = pg.Surface((1, surface.get_height()))
+        dark.fill((0, 0, 0))
+        dark.set_alpha(128)
+
         for x, ray in self.camera.rays(surface.get_width()):
             ray_info = _get_ray_hit_info(self.camera.pos, ray, self.world)
             height = int(surface.get_height() / ray_info.distance)
             column = _get_column(
                 textures[ray_info.hit - 1],
                 ray_info.wall_x_rat, height)
+
             surface.blit(column, (x, surface.get_height() / 2 - height / 2))
+
+            if ray_info.horizontal:
+                surface.blit(dark, (x, 0))
