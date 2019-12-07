@@ -12,16 +12,20 @@ WORLD_MAP = World([
     [2, 0, 0, 0, 0, 1, 1, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
+    [2, 0, 0, 0, 0, 3, 0, 1],
+    [2, 0, 0, 0, 0, 3, 0, 1],
+    [2, 0, 0, 0, 0, 3, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1],
 ])
 
 
 class Texture:
     def __init__(self, path, transparent=False):
-        self.surface = pg.image.load(path).convert()
+        image = pg.image.load(path)
+        if not transparent:
+            self.surface = image.convert()
+        else:
+            self.surface = image.convert_alpha()
         self.transparent = transparent
 
 
@@ -58,7 +62,8 @@ def main():
 
     textures = [
         Texture("assets/wood.bmp"),
-        Texture("assets/brick.bmp")
+        Texture("assets/brick.bmp"),
+        Texture("assets/glass.bmp", transparent=True)
     ]
 
     scene = Scene(WORLD_MAP, Camera((4, 4), (0, -1), 60 * math.pi / 180))
