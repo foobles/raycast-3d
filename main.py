@@ -12,7 +12,7 @@ WORLD_MAP = World([
     [2, 0, 0, 0, 0, 1, 1, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 3, 0, 1],
+    [2, 0, 0, 0, 3, 3, 0, 1],
     [2, 0, 0, 0, 0, 3, 0, 1],
     [2, 0, 0, 0, 0, 3, 0, 1],
     [1, 1, 1, 1, 1, 1, 1, 1],
@@ -29,7 +29,7 @@ class Texture:
         self.transparent = transparent
 
 
-def handle_input(scene):
+def handle_input(scene, dt):
     turn = 0
     for event in pg.event.get():
         if event.type == pg.QUIT:
@@ -37,27 +37,30 @@ def handle_input(scene):
 
     turn += pg.key.get_pressed()[pg.K_RIGHT]
     turn -= pg.key.get_pressed()[pg.K_LEFT]
-    scene.camera.rotate(turn * 2 * math.pi / 180)
+    scene.camera.rotate(dt * turn * 180 * math.pi / 180000)
 
     if pg.key.get_pressed()[pg.K_UP]:
-        speed = 0.1
+        speed = 4
         dx, dy = scene.camera.dir
         px, py = scene.camera.pos
         buffer = 0.2
         dx_b = buffer if dx > 0 else -buffer
         dy_b = buffer if dy > 0 else -buffer
 
-        if not scene.world.has_tile_at(int(px + dx * speed + dx_b), int(py)):
-            px += dx * speed
-        if not scene.world.has_tile_at(int(px), int(py + dy * speed + dy_b)):
-            py += dy * speed
+        x_mov = dt * dx * speed / 1000
+        y_mov = dt * dy * speed / 1000
+
+        if not scene.world.has_tile_at(int(px + x_mov + dx_b), int(py)):
+            px += x_mov
+        if not scene.world.has_tile_at(int(px), int(py + y_mov + dy_b)):
+            py += y_mov
 
         scene.camera.pos = (px, py)
 
 
 def main():
     pg.init()
-    size = 600, 600
+    size = 1050, 1000
     screen = pg.display.set_mode(size)
 
     textures = [
@@ -68,17 +71,20 @@ def main():
 
     scene = Scene(WORLD_MAP, Camera((4, 4), (0, -1), 60 * math.pi / 180))
 
-    fps = 30
-    prev_ticks = pg.time.get_ticks()
+    fps = 60
+    ms_per_frame = 1000 // fps
+
+    prev_ticks = 0
+    cur_ticks = pg.time.get_ticks()
 
     while True:
-        handle_input(scene)
+        handle_input(scene, cur_ticks - prev_ticks)
         screen.fill([0, 0, 0])
         scene.render(screen, textures)
         pg.display.flip()
-        cur_time = pg.time.get_ticks()
-        pg.time.delay(max(0, fps//1000 - (cur_time - prev_ticks)))
-        prev_ticks = cur_time
+        pg.time.delay(max(0, ms_per_frame - (cur_ticks - prev_ticks)))
+        prev_ticks = cur_ticks
+        cur_ticks = pg.time.get_ticks()
 
 
 if __name__ == "__main__":
