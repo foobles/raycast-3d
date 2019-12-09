@@ -9,13 +9,20 @@ from camera import Camera
 WORLD_MAP = World([
     [1, 1, 1, 1, 1, 1, 0, 0],
     [2, 0, 0, 1, 0, 1, 0, 0],
-    [2, 0, 0, 0, 0, 1, 1, 1],
+    [2, 0, 0, 1, 0, 1, 1, 1],
+    [2, 0, 0, 1, 0, 0, 0, 1],
+    [2, 0, 0, 1, 0, 0, 0, 1],
+    [2, 0, 0, 1, 0, 0, 0, 1],
+    [2, 0, 0, 1, 0, 0, 0, 1],
+    [2, 0, 0, 0, 0, 0, 0, 1],
+    [2, 0, 0, 0, 0, 0, 0, 1],
+    [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 3, 3, 0, 1],
     [2, 0, 0, 0, 0, 3, 0, 1],
     [2, 0, 0, 0, 0, 3, 0, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 4, 4, 1, 1, 1, 1, 1],
 ])
 
 
@@ -60,16 +67,17 @@ def handle_input(scene, dt):
 
 def main():
     pg.init()
-    size = 1050, 1000
+    size = 1210, 1200
     screen = pg.display.set_mode(size)
 
     textures = [
         Texture("assets/wood.bmp"),
         Texture("assets/brick.bmp"),
-        Texture("assets/glass.bmp", transparent=True)
+        Texture("assets/glass.bmp", transparent=True),
+        Texture("assets/world.bmp")
     ]
 
-    scene = Scene(WORLD_MAP, Camera((4, 4), (0, -1), 60 * math.pi / 180))
+    scene = Scene(WORLD_MAP, Camera((2, 4), (0, -1), 60 * math.pi / 180))
 
     fps = 60
     ms_per_frame = 1000 // fps
@@ -77,10 +85,13 @@ def main():
     prev_ticks = 0
     cur_ticks = pg.time.get_ticks()
 
+    surface = pg.Surface((size[0]//10, size[1]//10))
+
     while True:
         handle_input(scene, cur_ticks - prev_ticks)
-        screen.fill([0, 0, 0])
-        scene.render(screen, textures)
+        surface.fill([0, 0, 0])
+        scene.render(surface, textures)
+        pg.transform.scale(surface, size, screen)
         pg.display.flip()
         pg.time.delay(max(0, ms_per_frame - (cur_ticks - prev_ticks)))
         prev_ticks = cur_ticks
