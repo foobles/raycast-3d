@@ -12,6 +12,8 @@ class RayHitInfo:
 def _get_ray_hit_info(pos, ray, world, textures):
     pos_x, pos_y = pos
     ray_x, ray_y = ray
+    ray_x = ray_x or 0.01
+    ray_y = ray_y or 0.01
     tile_x, tile_y = int(pos_x), int(pos_y)
     x_tile_dist = abs(1 / ray_x)
     y_tile_dist = abs(1 / ray_y)
