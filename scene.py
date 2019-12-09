@@ -1,4 +1,3 @@
-import math
 import pygame as pg
 
 
@@ -14,14 +13,8 @@ def _get_ray_hit_info(pos, ray, world, textures):
     pos_x, pos_y = pos
     ray_x, ray_y = ray
     tile_x, tile_y = int(pos_x), int(pos_y)
-    x_tile_dist = math.sqrt(1 + (ray_y * ray_y) / (
-        (ray_x * ray_x)
-        if ray_x != 0
-        else 1))
-    y_tile_dist = math.sqrt(1 + (ray_x * ray_x) / (
-        (ray_y * ray_y)
-        if ray_y != 0
-        else 1))
+    x_tile_dist = abs(1 / ray_x)
+    y_tile_dist = abs(1 / ray_y)
 
     x_step = 1 if ray_x > 0 else -1
     x_dist_moved = x_tile_dist * (
@@ -81,7 +74,11 @@ class Scene:
         dark.set_alpha(0.3 * 256)
 
         for x, ray in self.camera.rays(surface.get_width()):
-            for ray_info in _get_ray_hit_info(self.camera.pos, ray, self.world, textures):
+            for ray_info in _get_ray_hit_info(
+                    self.camera.pos,
+                    ray,
+                    self.world,
+                    textures):
                 height = int(surface_height / ray_info.distance)
                 column = _get_column(
                     textures[ray_info.hit - 1].surface,
@@ -90,5 +87,6 @@ class Scene:
 
                 surface.blit(column, (x, surface_height / 2 - height / 2))
 
-                if ray_info.horizontal:
+                if (ray_info.horizontal and
+                        not textures[ray_info.hit-1].transparent):
                     surface.blit(dark, (x, 0))
