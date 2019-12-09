@@ -85,7 +85,7 @@ def main():
     prev_ticks = 0
     cur_ticks = pg.time.get_ticks()
 
-    surface = pg.Surface((size[0]//10, size[1]//10))
+    surface = pg.Surface((size[0]//8, size[1]//8))
 
     while True:
         handle_input(scene, cur_ticks - prev_ticks)
