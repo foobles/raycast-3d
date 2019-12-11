@@ -67,7 +67,7 @@ def handle_input(scene, dt):
 
 def main():
     pg.init()
-    size = 1210, 1200
+    size = 1010, 1000
     screen = pg.display.set_mode(size)
 
     textures = [
