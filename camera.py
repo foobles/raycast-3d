@@ -26,7 +26,7 @@ class Camera:
         dir_x, dir_y = self.dir
         screen_x, screen_y = self.screen
         for x in range(width):
-            cur = (2 * x / width) - 1
+            cam_rat = (2 * x / width) - 1
             yield x, (
-                dir_x + screen_x * cur,
-                dir_y + screen_y * cur)
+                dir_x + screen_x * cam_rat,
+                dir_y + screen_y * cam_rat)
