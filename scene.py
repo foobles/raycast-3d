@@ -65,22 +65,27 @@ def _get_column(texture, x_rat, height):
 
 
 class Scene:
-    def __init__(self, world, camera):
+    def __init__(self, world, sprites, camera):
         self.world = world
+        self.sprites = sprites 
         self.camera = camera
 
-    def render(self, surface, textures):
+    def render_walls(self, surface, textures):
         surface_height = surface.get_height()
         dark = pg.Surface((1, surface_height))
         dark.fill((0, 0, 0))
         dark.set_alpha(0.3 * 256)
+        z_buf = []
 
         for x, ray in self.camera.rays(surface.get_width()):
-            for ray_info in _get_ray_hit_info(
-                    self.camera.pos,
-                    ray,
-                    self.world,
-                    textures):
+            ray_infos = _get_ray_hit_info(
+                self.camera.pos,
+                ray,
+                self.world,
+                textures)
+            z_buf.append(ray_infos[0].distance)
+
+            for ray_info in ray_infos:
                 height = int(surface_height / ray_info.distance)
                 column = _get_column(
                     textures[ray_info.hit - 1].surface,
@@ -92,3 +97,31 @@ class Scene:
                 if (ray_info.horizontal and
                         not textures[ray_info.hit-1].transparent):
                     surface.blit(dark, (x, 0))
+        return z_buf 
+
+    def render_sprites(self, surface, z_buf):
+        pos_x, pos_y = self.camera.pos 
+        plane_x, plane_y = self.camera.screen 
+        dir_x, dir_y = self.camera.dir 
+        self.sprites.sort(key=lambda spr: (pos_x - spr.x)**2 + (pos_y - spr.y)**2)
+
+        for spr in self.sprites:
+            sr_x, sr_y = spr.x - pos_x, spr.y - pos_y 
+            det =  1 / (plane_x  * dir_y - dir_x * plane_y)
+            trans_x, trans_y = ( 
+                det * (dir_y * sr_x - dir_x * sr_y),
+                det * (-plane_y * sr_x + plane_x * sr_y))
+            
+            height = int(abs(surface.get_height() / trans_y))
+            spr_x_pos = surface.get_width() * (trans_x + 1) / (trans_y * 2) 
+            draw_y = int(max(0, (surface.get_height() - height) / 2))
+          
+            width = abs(surface.get_width() / trans_y)
+            draw_start_x = int(max(0, spr_x_pos - width / 2))
+            draw_end_x = int(min(surface.get_width(), spr_x_pos + width / 2))
+            cur_surface = pg.Surface((1, height)).convert_alpha() 
+            print("rendering")
+            for x in range(draw_start_x, draw_end_x):
+                spr_surface_x = int(spr.surface.get_width() * (x - spr_x_pos + width / 2) / width)
+                subsurface = spr.surface.subsurface(pg.Rect(spr_surface_x, 0, 1, spr.surface.get_height()))
+                surface.blit(pg.transform.scale(subsurface, (1, height)), (x, draw_y)) 

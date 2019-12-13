@@ -36,6 +36,13 @@ class Texture:
         self.transparent = transparent
 
 
+class Sprite: 
+    def __init__(self, path, x, y):
+        self.surface = pg.image.load(path).convert_alpha() 
+        self.x = x 
+        self.y = y
+
+
 def handle_input(scene, dt):
     turn = 0
     for event in pg.event.get():
@@ -77,7 +84,12 @@ def main():
         Texture("assets/world.bmp")
     ]
 
-    scene = Scene(WORLD_MAP, Camera((2, 4), (0, -1), 60 * math.pi / 180))
+    sprites = [Sprite("assets/mado.bmp", 1.5, 10.5)]
+
+    scene = Scene(
+        world=WORLD_MAP, 
+        sprites=sprites,
+        camera=Camera((2, 4), (0, -1), 60 * math.pi / 180))
 
     fps = 60
     ms_per_frame = 1000 // fps
@@ -90,7 +102,8 @@ def main():
     while True:
         handle_input(scene, cur_ticks - prev_ticks)
         surface.fill([0, 0, 0])
-        scene.render(surface, textures)
+        z_buf = scene.render_walls(surface, textures)
+        scene.render_sprites(surface, z_buf)
         pg.transform.scale(surface, size, screen)
         pg.display.flip()
         pg.time.delay(max(0, ms_per_frame - (cur_ticks - prev_ticks)))
