@@ -113,14 +113,13 @@ class Scene:
                 det * (-plane_y * sr_x + plane_x * sr_y))
             
             height = int(abs(surface.get_height() / trans_y))
-            spr_x_pos = surface.get_width() * (trans_x + 1) / (trans_y * 2) 
+            spr_x_pos = surface.get_width() / 2 * (1 + trans_x / trans_y) 
             draw_y = int(max(0, (surface.get_height() - height) / 2))
           
             width = abs(surface.get_width() / trans_y)
             draw_start_x = int(max(0, spr_x_pos - width / 2))
             draw_end_x = int(min(surface.get_width(), spr_x_pos + width / 2))
             cur_surface = pg.Surface((1, height)).convert_alpha() 
-            print("rendering")
             for x in range(draw_start_x, draw_end_x):
                 if z_buf[x] > trans_y and trans_y > 0:
                     spr_surface_x = int(spr.surface.get_width() * (x - spr_x_pos + width / 2) / width)
