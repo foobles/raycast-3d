@@ -122,6 +122,7 @@ class Scene:
             cur_surface = pg.Surface((1, height)).convert_alpha() 
             print("rendering")
             for x in range(draw_start_x, draw_end_x):
-                spr_surface_x = int(spr.surface.get_width() * (x - spr_x_pos + width / 2) / width)
-                subsurface = spr.surface.subsurface(pg.Rect(spr_surface_x, 0, 1, spr.surface.get_height()))
-                surface.blit(pg.transform.scale(subsurface, (1, height)), (x, draw_y)) 
+                if z_buf[x] > trans_y and trans_y > 0:
+                    spr_surface_x = int(spr.surface.get_width() * (x - spr_x_pos + width / 2) / width)
+                    subsurface = spr.surface.subsurface(pg.Rect(spr_surface_x, 0, 1, spr.surface.get_height()))
+                    surface.blit(pg.transform.scale(subsurface, (1, height)), (x, draw_y)) 
