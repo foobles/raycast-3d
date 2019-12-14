@@ -8,13 +8,13 @@ from camera import Camera
 
 WORLD_MAP = World([
     [1, 1, 1, 1, 1, 1, 0, 0],
-    [2, 0, 0, 1, 0, 1, 0, 0],
-    [2, 0, 0, 1, 0, 1, 1, 1],
-    [2, 0, 0, 1, 0, 0, 0, 1],
-    [2, 0, 0, 1, 0, 0, 0, 1],
-    [2, 0, 0, 1, 0, 0, 0, 1],
-    [2, 0, 0, 1, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
+    [2, 0, 0, 0, 0, 1, 0, 0],
+    [2, 0, 0, 0, 0, 1, 1, 1],
+    [2, 0, 0, 0, 1, 1, 0, 1],
+    [2, 0, 1, 0, 0, 0, 0, 1],
+    [2, 0, 1, 0, 0, 0, 0, 1],
+    [2, 0, 1, 0, 0, 0, 0, 1],
+    [2, 0, 1, 1, 3, 3, 1, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
     [2, 0, 0, 0, 0, 0, 0, 1],
@@ -46,10 +46,10 @@ class Texture:
         self.transparent = transparent
 
 
-class Sprite: 
-    def __init__(self, path, x, y):
-        self.surface = pg.image.load(path).convert_alpha() 
-        self.x = x 
+class Sprite:
+    def __init__(self, idx, x, y):
+        self.idx = idx
+        self.x = x
         self.y = y
 
 
@@ -95,13 +95,18 @@ def main():
     ]
 
     sprites = [
-        Sprite("assets/mado.bmp", 1.5, 8.5),
-        Sprite("assets/world.bmp", 4.5, 10.5)
+        pg.image.load("assets/mado.bmp").convert_alpha(),
+        pg.image.load("assets/sad_bloke_head.png").convert_alpha()
+    ]
+
+    world_sprites = [
+        Sprite(0, 2.5, 8.5),
+        Sprite(1, 4.6, 10.5)
     ]
 
     scene = Scene(
-        world=WORLD_MAP, 
-        sprites=sprites,
+        world=WORLD_MAP,
+        sprites=world_sprites,
         camera=Camera((2, 4), (0, -1), 60 * math.pi / 180))
 
     fps = 60
@@ -116,7 +121,7 @@ def main():
         handle_input(scene, cur_ticks - prev_ticks)
         surface.fill([0, 0, 0])
         z_buf = scene.render_walls(surface, textures)
-        scene.render_sprites(surface, z_buf)
+        scene.render_sprites(surface, z_buf, sprites)
         pg.transform.scale(surface, size, screen)
         pg.display.flip()
         pg.time.delay(max(0, ms_per_frame - (cur_ticks - prev_ticks)))

@@ -99,7 +99,7 @@ class Scene:
                     surface.blit(dark, (x, 0))
         return z_buf
 
-    def render_sprites(self, surface, z_buf):
+    def render_sprites(self, surface, z_buf, sprites):
         pos_x, pos_y = self.camera.pos
         plane_x, plane_y = self.camera.screen
         dir_x, dir_y = self.camera.dir
@@ -108,6 +108,7 @@ class Scene:
             key=lambda spr: (pos_x - spr.x)**2 + (pos_y - spr.y)**2)
 
         for spr in self.sprites:
+            spr_surface = sprites[spr.idx]
             sr_x, sr_y = spr.x - pos_x, spr.y - pos_y
             det = 1 / (plane_x * dir_y - dir_x * plane_y)
             trans_x, trans_y = (
@@ -118,20 +119,21 @@ class Scene:
             spr_x_pos = surface.get_width() / 2 * (1 + trans_x / trans_y)
             draw_y = int(max(0, (surface.get_height() - height) / 2))
 
-            wh_rat = spr.surface.get_width() / spr.surface.get_height()
+            wh_rat = spr_surface.get_width() / spr_surface.get_height()
             width = int(abs(surface.get_width() / trans_y * wh_rat))
             draw_start_x = int(max(0, spr_x_pos - width / 2))
             draw_end_x = int(min(surface.get_width(), spr_x_pos + width / 2))
             for x in range(draw_start_x, draw_end_x):
                 if z_buf[x] > trans_y and trans_y > 0:
                     spr_surface_x = int(
-                        spr.surface.get_width() *
+                        spr_surface.get_width() *
                         (x - int(spr_x_pos - width / 2)) / width)
-                    subsurface = spr.surface.subsurface(pg.Rect(
+                    subsurface = spr_surface.subsurface(pg.Rect(
                         spr_surface_x,
                         0,
                         1,
-                        spr.surface.get_height()))
+                        spr_surface.get_height()))
+                    print("rend")
                     surface.blit(
                         pg.transform.scale(subsurface, (1, height)),
                         (x, draw_y))
