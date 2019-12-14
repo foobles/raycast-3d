@@ -133,7 +133,6 @@ class Scene:
                         0,
                         1,
                         spr_surface.get_height()))
-                    print("rend")
                     surface.blit(
                         pg.transform.scale(subsurface, (1, height)),
                         (x, draw_y))
