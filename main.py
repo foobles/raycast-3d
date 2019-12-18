@@ -5,36 +5,25 @@ from world import World
 from scene import Scene
 from camera import Camera
 
+def world_from_surface(surface, colors):
+    conv_colors = [surface.map_rgb(c) for c in colors]
+    arr = pg.PixelArray(surface)
+    ret = [] 
+    cur = []  
+    for y in range(surface.get_height()):
+        for x in range(surface.get_width()):
+            cur.append(conv_colors.index(arr[x, y]))
+        ret.append(cur) 
+        cur = [] 
+    arr.close() 
+    return World(ret) 
 
-WORLD_MAP = World([
-    [1, 1, 1, 1, 1, 1, 0, 0],
-    [2, 0, 0, 0, 0, 1, 0, 0],
-    [2, 0, 0, 0, 0, 1, 1, 1],
-    [2, 0, 0, 0, 1, 1, 0, 1],
-    [2, 0, 1, 0, 0, 0, 0, 1],
-    [2, 0, 1, 0, 0, 0, 0, 1],
-    [2, 0, 1, 0, 0, 0, 0, 1],
-    [2, 0, 1, 1, 3, 3, 1, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 0, 0, 0, 1],
-    [2, 0, 0, 0, 3, 3, 0, 1],
-    [2, 0, 0, 0, 0, 3, 0, 1],
-    [2, 0, 0, 0, 0, 3, 0, 1],
-    [1, 4, 4, 1, 1, 1, 1, 1],
+
+WORLD_MAP = world_from_surface(pg.image.load("assets/map.bmp"), [
+    (255, 255, 255),
+    (0, 0, 0),
+    (255, 0, 0)
 ])
-
 
 class Texture:
     def __init__(self, path, transparent=False):
@@ -84,7 +73,7 @@ def handle_input(scene, dt):
 
 def main():
     pg.init()
-    size = 1010, 1000
+    size = 910, 800
     screen = pg.display.set_mode(size)
 
     textures = [
@@ -96,7 +85,7 @@ def main():
 
     sprites = [
         pg.image.load("assets/mado.bmp").convert_alpha(),
-        pg.image.load("assets/sad_bloke_head.png").convert_alpha()
+        pg.image.load("assets/uboa.png").convert_alpha()
     ]
 
     world_sprites = [
@@ -107,7 +96,7 @@ def main():
     scene = Scene(
         world=WORLD_MAP,
         sprites=world_sprites,
-        camera=Camera((2, 4), (0, -1), 60 * math.pi / 180))
+        camera=Camera((16, 16), (0, -1), 60 * math.pi / 180))
 
     fps = 60
     ms_per_frame = 1000 // fps
