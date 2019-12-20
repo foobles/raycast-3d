@@ -166,13 +166,15 @@ def main():
     surface = pg.Surface((size[0]//8, size[1]//8))
 
     while True:
-        handle_input(scene, cur_ticks - prev_ticks)
+        dt = cur_ticks - prev_ticks
+        handle_input(scene, dt)
+        scene.update(dt)
         surface.fill([0, 0, 0])
         z_buf = render_walls(scene, surface, textures)
         render_sprites(scene, surface, z_buf, sprites)
         pg.transform.scale(surface, size, screen)
         pg.display.flip()
-        pg.time.delay(max(0, ms_per_frame - (cur_ticks - prev_ticks)))
+        pg.time.delay(max(0, ms_per_frame - dt))
         prev_ticks = cur_ticks
         cur_ticks = pg.time.get_ticks()
 
