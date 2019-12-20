@@ -1,6 +1,7 @@
 import sys
 import math
 import pygame as pg
+from render import render_sprites, render_walls
 from world import World
 from scene import Scene
 from camera import Camera
@@ -90,25 +91,31 @@ def handle_input(scene, dt):
         scene.camera.pos = (px, py)
 
 
-def main():
-    pg.init()
-    size = 910, 600
-    screen = pg.display.set_mode(size)
-
-    textures = [
+def load_textures():
+    return [
         Texture("assets/wood.bmp"),
         Texture("assets/brick.bmp"),
         Texture("assets/glass.bmp", transparent=True),
         Texture("assets/world.bmp")
     ]
 
-    sprites = [
+
+def load_sprites():
+    return [
         pg.image.load(s).convert_alpha()
         for s in [
             "assets/mado.bmp",
             "assets/uboa.png"
         ]
     ]
+
+
+def main():
+    pg.init()
+    size = 910, 600
+    screen = pg.display.set_mode(size)
+
+    textures, sprites = load_textures(), load_sprites()
 
     scene = Scene(
         world=WORLD_MAP,
@@ -126,8 +133,8 @@ def main():
     while True:
         handle_input(scene, cur_ticks - prev_ticks)
         surface.fill([0, 0, 0])
-        z_buf = scene.render_walls(surface, textures)
-        scene.render_sprites(surface, z_buf, sprites)
+        z_buf = render_walls(scene, surface, textures)
+        render_sprites(scene, surface, z_buf, sprites)
         pg.transform.scale(surface, size, screen)
         pg.display.flip()
         pg.time.delay(max(0, ms_per_frame - (cur_ticks - prev_ticks)))
