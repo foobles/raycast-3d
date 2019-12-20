@@ -3,27 +3,7 @@ import math
 import pygame as pg
 from world import World
 from scene import Scene
-from camera import Camera
-
-def world_from_surface(surface, colors):
-    conv_colors = [surface.map_rgb(c) for c in colors]
-    arr = pg.PixelArray(surface)
-    ret = [] 
-    cur = []  
-    for y in range(surface.get_height()):
-        for x in range(surface.get_width()):
-            cur.append(conv_colors.index(arr[x, y]))
-        ret.append(cur) 
-        cur = [] 
-    arr.close() 
-    return World(ret) 
-
-
-WORLD_MAP = world_from_surface(pg.image.load("assets/map.bmp"), [
-    (255, 255, 255),
-    (0, 0, 0),
-    (255, 0, 0)
-])
+from camera import Camera 
 
 class Texture:
     def __init__(self, path, transparent=False):
@@ -40,6 +20,41 @@ class Sprite:
         self.idx = idx
         self.x = x
         self.y = y
+
+
+def world_from_surface(surface, tex_colors, spr_colors):
+    conv_tex_colors = [surface.map_rgb(c) for c in tex_colors]
+    conv_spr_colors = [surface.map_rgb(c) for c in spr_colors]
+    arr = pg.PixelArray(surface)
+    world_ret = [] 
+    cur = []  
+    spr_ret = []
+    for y in range(surface.get_height()):
+        for x in range(surface.get_width()):
+            cur_color = arr[x, y]
+            try:
+                cur.append(conv_tex_colors.index(cur_color)) 
+            except ValueError: 
+                cur.append(0) 
+                spr_ret.append(Sprite(conv_spr_colors.index(cur_color), x + 0.5, y + 0.5))
+        world_ret.append(cur) 
+        cur = [] 
+    arr.close() 
+    return World(world_ret), spr_ret
+
+
+WORLD_MAP, SPRITE_MAP = world_from_surface(
+    pg.image.load("assets/map.bmp"), 
+    tex_colors=[
+        (255, 255, 255),
+        (0, 0, 0),
+        (255, 0, 0),
+        (255, 0, 255)
+    ],
+    spr_colors=[
+        (0, 255, 0),
+        (0, 255, 255)
+    ])
 
 
 def handle_input(scene, dt):
@@ -73,7 +88,7 @@ def handle_input(scene, dt):
 
 def main():
     pg.init()
-    size = 910, 800
+    size = 910, 600
     screen = pg.display.set_mode(size)
 
     textures = [
@@ -88,15 +103,10 @@ def main():
         pg.image.load("assets/uboa.png").convert_alpha()
     ]
 
-    world_sprites = [
-        Sprite(0, 2.5, 8.5),
-        Sprite(1, 4.6, 10.5)
-    ]
-
     scene = Scene(
         world=WORLD_MAP,
-        sprites=world_sprites,
-        camera=Camera((16, 16), (0, -1), 60 * math.pi / 180))
+        sprites=SPRITE_MAP,
+        camera=Camera((1.5, 1.5), (0, -1), 60 * math.pi / 180))
 
     fps = 60
     ms_per_frame = 1000 // fps
