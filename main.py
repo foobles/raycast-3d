@@ -3,7 +3,8 @@ import math
 import pygame as pg
 from world import World
 from scene import Scene
-from camera import Camera 
+from camera import Camera
+
 
 class Texture:
     def __init__(self, path, transparent=False):
@@ -26,25 +27,28 @@ def world_from_surface(surface, tex_colors, spr_colors):
     conv_tex_colors = [surface.map_rgb(c) for c in tex_colors]
     conv_spr_colors = [surface.map_rgb(c) for c in spr_colors]
     arr = pg.PixelArray(surface)
-    world_ret = [] 
-    cur = []  
+    world_ret = []
+    cur = []
     spr_ret = []
     for y in range(surface.get_height()):
         for x in range(surface.get_width()):
             cur_color = arr[x, y]
             try:
-                cur.append(conv_tex_colors.index(cur_color)) 
-            except ValueError: 
-                cur.append(0) 
-                spr_ret.append(Sprite(conv_spr_colors.index(cur_color), x + 0.5, y + 0.5))
-        world_ret.append(cur) 
-        cur = [] 
-    arr.close() 
+                cur.append(conv_tex_colors.index(cur_color))
+            except ValueError:
+                cur.append(0)
+                spr_ret.append(Sprite(
+                    conv_spr_colors.index(cur_color),
+                    x + 0.5,
+                    y + 0.5))
+        world_ret.append(cur)
+        cur = []
+    arr.close()
     return World(world_ret), spr_ret
 
 
 WORLD_MAP, SPRITE_MAP = world_from_surface(
-    pg.image.load("assets/map.bmp"), 
+    pg.image.load("assets/map.bmp"),
     tex_colors=[
         (255, 255, 255),
         (0, 0, 0),
@@ -99,7 +103,7 @@ def main():
     ]
 
     sprites = [
-        pg.image.load(s).convert_alpha() 
+        pg.image.load(s).convert_alpha()
         for s in [
             "assets/mado.bmp",
             "assets/uboa.png"
