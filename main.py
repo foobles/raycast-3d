@@ -99,8 +99,11 @@ def main():
     ]
 
     sprites = [
-        pg.image.load("assets/mado.bmp").convert_alpha(),
-        pg.image.load("assets/uboa.png").convert_alpha()
+        pg.image.load(s).convert_alpha() 
+        for s in [
+            "assets/mado.bmp",
+            "assets/uboa.png"
+        ]
     ]
 
     scene = Scene(
