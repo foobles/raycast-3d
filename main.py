@@ -1,5 +1,6 @@
 import sys
 import math
+import random
 import pygame as pg
 from render import render_sprites, render_walls
 from world import World
@@ -136,11 +137,25 @@ def main():
 
     textures, sprites = load_textures(), load_sprites()
 
-    scene = UnloadedScene(
-        "assets/map.bmp",
-        Camera((1.5, 1.5), (0, -1), 60 * math.pi / 180),
-        TEX_COLORS,
-        SPR_COLORS).load()
+    scenes = [
+        UnloadedScene(
+            "assets/maps/{:02}.bmp".format(n),
+            Camera((1.5, 1.5), (0, -1), 60 * math.pi / 180),
+            TEX_COLORS,
+            SPR_COLORS)
+        for n in range(2)
+    ]
+    cur_scene_idx = 0
+    scene = None
+
+    def setup_scene():
+        nonlocal cur_scene_idx
+        nonlocal scene
+        scene = scenes[cur_scene_idx].load()
+        random.choice(scene.sprites).on_touch = setup_scene
+        cur_scene_idx = (cur_scene_idx + 1) % len(scenes)
+
+    setup_scene()
 
     fps = 60
     ms_per_frame = 1000 // fps
