@@ -124,7 +124,7 @@ class Scene:
             draw_start_x = int(max(0, spr_x_pos - width / 2))
             draw_end_x = int(min(surface.get_width(), spr_x_pos + width / 2))
             for x in range(draw_start_x, draw_end_x):
-                if z_buf[x] > trans_y and trans_y > 0:
+                if z_buf[x] > trans_y and trans_y > 0.1:
                     spr_surface_x = int(
                         spr_surface.get_width() *
                         (x - int(spr_x_pos - width / 2)) / width)
