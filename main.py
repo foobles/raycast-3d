@@ -18,10 +18,11 @@ class Texture:
 
 
 class Sprite:
-    def __init__(self, idx, x, y):
+    def __init__(self, idx, x, y, on_touch=None):
         self.idx = idx
         self.x = x
         self.y = y
+        self.on_touch = on_touch or (lambda *args: None)
 
 
 def world_from_surface(surface, tex_colors, spr_colors):
@@ -48,18 +49,36 @@ def world_from_surface(surface, tex_colors, spr_colors):
     return World(world_ret), spr_ret
 
 
-WORLD_MAP, SPRITE_MAP = world_from_surface(
-    pg.image.load("assets/map.bmp"),
-    tex_colors=[
-        (255, 255, 255),
-        (0, 0, 0),
-        (255, 0, 0),
-        (255, 0, 255)
-    ],
-    spr_colors=[
-        (0, 255, 0),
-        (0, 255, 255)
-    ])
+TEX_COLORS = [
+    (255, 255, 255),
+    (0, 0, 0),
+    (255, 0, 0),
+    (255, 0, 255)
+]
+
+
+SPR_COLORS = [
+    (0, 255, 0),
+    (0, 255, 255)
+]
+
+
+class UnloadedScene:
+    def __init__(self, map_path, cam, tex_colors, spr_colors):
+        self.map_path = map_path
+        self.cam = cam
+        self.tex_colors = tex_colors
+        self.spr_colors = spr_colors
+        self.on_load = lambda scene: None
+
+    def load(self):
+        world, sprites = world_from_surface(
+            pg.image.load(self.map_path),
+            self.tex_colors,
+            self.spr_colors)
+        ret = Scene(world, sprites, self.cam)
+        self.on_load(ret)
+        return ret
 
 
 def handle_input(scene, dt):
@@ -117,10 +136,11 @@ def main():
 
     textures, sprites = load_textures(), load_sprites()
 
-    scene = Scene(
-        world=WORLD_MAP,
-        sprites=SPRITE_MAP,
-        camera=Camera((1.5, 1.5), (0, -1), 60 * math.pi / 180))
+    scene = UnloadedScene(
+        "assets/map.bmp",
+        Camera((1.5, 1.5), (0, -1), 60 * math.pi / 180),
+        TEX_COLORS,
+        SPR_COLORS).load()
 
     fps = 60
     ms_per_frame = 1000 // fps
