@@ -12,4 +12,4 @@ class Scene:
                 cam_y - s.y)
             e_dist_squared = dist_x**2 + dist_y**2
             if e_dist_squared <= 0.2**2:
-                s.on_touch()
+                s.run_on_touch()

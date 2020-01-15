@@ -6,6 +6,7 @@ from render import render_sprites, render_walls
 from world import World
 from scene import Scene
 from camera import Camera
+import words
 
 
 class Texture:
@@ -23,7 +24,11 @@ class Sprite:
         self.idx = idx
         self.x = x
         self.y = y
-        self.on_touch = on_touch or (lambda *args: None)
+        self.on_touch = on_touch
+
+    def run_on_touch(self):
+        if self.on_touch:
+            self.on_touch(self)
 
 
 def world_from_surface(surface, tex_colors, spr_colors):
@@ -148,14 +153,25 @@ def main():
     cur_scene_idx = 0
     scene = None
 
-    def setup_scene():
+    word_list = words.get_word_list("assets/words.txt")
+    cur_word_list = []
+
+    def generate_word(spr):
+        cur_word_list.append(random.choice(word_list))
+        spr.on_touch = None
+        next = random.choice(scene.sprites)
+        if not next.on_touch:
+            next.on_touch = generate_word
+
+    def setup_scene(spr):
         nonlocal cur_scene_idx
         nonlocal scene
         scene = scenes[cur_scene_idx].load()
+        random.choice(scene.sprites).on_touch = generate_word
         random.choice(scene.sprites).on_touch = setup_scene
         cur_scene_idx = (cur_scene_idx + 1) % len(scenes)
 
-    setup_scene()
+    setup_scene(None)
 
     fps = 60
     ms_per_frame = 1000 // fps
@@ -165,6 +181,8 @@ def main():
 
     surface = pg.Surface((size[0]//8, size[1]//8))
 
+    sys_font = pg.font.Font("assets/source_code.ttf", 6)
+
     while True:
         dt = cur_ticks - prev_ticks
         handle_input(scene, dt)
@@ -172,6 +190,13 @@ def main():
         surface.fill([0, 0, 0])
         z_buf = render_walls(scene, surface, textures)
         render_sprites(scene, surface, z_buf, sprites)
+
+        words.render_words(
+            surface,
+            sys_font,
+            cur_word_list,
+            pg.Color(255, 255, 255))
+
         pg.transform.scale(surface, size, screen)
         pg.display.flip()
         pg.time.delay(max(0, ms_per_frame - dt))
