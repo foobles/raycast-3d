@@ -137,7 +137,7 @@ def load_sprites():
 
 def main():
     pg.init()
-    size = 910, 600
+    size = int(910*1.2), int(600*1.2)
     screen = pg.display.set_mode(size)
 
     textures, sprites = load_textures(), load_sprites()
@@ -167,8 +167,9 @@ def main():
         nonlocal cur_scene_idx
         nonlocal scene
         scene = scenes[cur_scene_idx].load()
-        random.choice(scene.sprites).on_touch = generate_word
-        random.choice(scene.sprites).on_touch = setup_scene
+        if len(scene.sprites) > 0:
+            random.choice(scene.sprites).on_touch = generate_word
+            random.choice(scene.sprites).on_touch = setup_scene
         cur_scene_idx = (cur_scene_idx + 1) % len(scenes)
 
     setup_scene(None)
