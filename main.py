@@ -179,7 +179,7 @@ def main():
     prev_ticks = 0
     cur_ticks = pg.time.get_ticks()
 
-    surface = pg.Surface((size[0]//8, size[1]//8))
+    surface = pg.Surface((size[0]//6, size[1]//6))
 
     sys_font = pg.font.Font("assets/source_code.ttf", 6)
 
